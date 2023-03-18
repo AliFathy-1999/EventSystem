@@ -1,14 +1,21 @@
 import {Schema,model} from 'mongoose';
-const validator =  require('validator');
-import { Student } from "../schemaTypes.ts"
-const schema : Student= new Schema({
+const validator = require('validator');
+import { Student } from "../schemaTypes"
+const bcryptjs = require('bcryptjs');
+const schema = new Schema<Student>({
     _id:{
         type:Number,
+        required: true,
     },
     fullName:{
         type:String,
         minLength:6,
         maxLength:20
+    },
+    email:{
+        type:String,
+        required:true,
+        unique:true,
     },
     password:{
         type:String,
@@ -24,21 +31,18 @@ const schema : Student= new Schema({
                 throw new Error("Password must contain at least one number , Capital letter and one special character")
             }
         },
-        email:{
-            type:String,
-            required:true,
-            trim:true,
-            unique:true,
-            validate(value:string){
-                if(!validator.isEmail(value))
-                    throw new Error("Invalid Email, your input must be matched with email formate")            
-            }
-        },
-    },
+    },  
+    isAdmin: {
+        type: Boolean,
+        default: false,
+      },
 },{
     timestamps:true
 })
 
 const Students = model("Students",schema);
-
+schema.pre("save",async function(){
+    if(this.isModified("password"))
+         this.password = bcryptjs.hash(this.password,10);
+})
 module.exports = Students;

@@ -1,11 +1,22 @@
-import {Schema,model} from 'mongoose';
-import validator from 'validator';
-import { Speaker } from "../schemaTypes.ts"
-const schema : Speaker = new Schema({
+const validator = require('validator');
+const bcryptjs = require('bcryptjs');
+import { Schema, model } from 'mongoose';
+import { Speaker } from "../schemaTypes"
+
+const schema  = new Schema<Speaker>({
     fullName:{
         type:String,
         minLength:6,
         maxLength:20
+    },
+    email:{
+        type:String,
+        required:true,
+        unique:true,
+    },
+    image:{
+        type:String,
+        default:"https://secure.gravatar.com/avatar/${this._id}?s=90&d=identicon"
     },
     password:{
         type:String,
@@ -21,25 +32,26 @@ const schema : Speaker = new Schema({
                 throw new Error("Password must contain at least one number , Capital letter and one special character")
             }
         },
-        email:{
-            type:String,
-            required:true,
-            trim:true,
-            unique:true,
-            validate(value:string){
-                if(!validator.isEmail(value))
-                    throw new Error("Invalid Email, your input must be matched with email formate")            
-            }
+        isAdmin: {
+            type: Boolean,
+            default: false,
         },
-        image:{
-            type:String,
-            default:"https://secure.gravatar.com/avatar/${this._id}?s=90&d=identicon"
-        }
     },
 },{
-    timestamps:true
+    timestamps:true,
 })
-
+schema.methods.toJSON = function () {
+    const userObject = this.toObject();
+    delete userObject.password;
+    delete userObject.__v;
+    delete userObject.isAdmin;
+    return userObject;
+}
+schema.pre("save",async function(){
+    const user = this;
+    if(this.isModified("password"))
+        this.password = await bcryptjs.hash(this.password,10);
+})
 const Speakers = model("Speakers",schema);
 
 module.exports = Speakers;

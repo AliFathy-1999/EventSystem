@@ -1,7 +1,7 @@
 import mongoose, {Schema,model} from 'mongoose';
-import validator from 'validator';
-import { Event } from "../schemaTypes.ts"
-const schema : Event= new Schema({
+const validator = require('validator');
+import { Event } from "../schemaTypes"
+const schema = new Schema<Event>({
     title:{
         type:String,
         required:true,
@@ -18,7 +18,7 @@ const schema : Event= new Schema({
         },
         },
         mainSpeaker:{
-            type:mongoose.Types.ObjectId,
+            type:String,
             ref:"Speakers",
             required:true,
         },

@@ -1,5 +1,5 @@
 module.exports = {
-    studentsRoute : require("./students"),
-    speakersRoute : require("./speakers"),
-    eventsRoute : require("./events")
+    studentsRoute : require("./students.ts"),
+    speakersRoute : require("./speakers.ts"),
+    eventsRoute : require("./events.ts")
 }

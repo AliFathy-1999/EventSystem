@@ -36,6 +36,11 @@ module.exports = {
           ],
           "no-console":1,
           "no-var":1,
+          "no-multiple-empty-lines":[
+            "error",{
+                "max":1
+            }
+          ],
     },
 
 }
